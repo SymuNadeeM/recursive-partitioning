@@ -20,52 +20,25 @@ const LayoutBuilder = () => {
   const splitPartition = (id, splitDirection) => {
     setPartitions((prevPartitions) => {
       const newPartitions = [];
-      let partitionFound = false;
-
       prevPartitions.forEach((partition) => {
         if (partition.id === id) {
-          partitionFound = true;
-
-          // Calculate new partition sizes
-          const newSize = partition.size / 2;
-
-          if (splitDirection === "H") {
-            // Horizontal split, keep direction same as original
-            newPartitions.push({
-              ...partition,
-              size: newSize,
-              direction: "row", // Keep the partition in row direction
-            });
-
-            newPartitions.push({
-              id: Date.now() + 1,
-              color: getRandomColor(),
-              size: newSize,
-              direction: "row", // Keep the partition in row direction for horizontal
-            });
-          } else if (splitDirection === "V") {
-            // Vertical split: stack partitions inside the original partition using flex-col (Y-axis)
-            newPartitions.push({
-              ...partition,
-              size: newSize,
-              direction: "column", // Change direction to column for vertical split
-            });
-
-            newPartitions.push({
-              id: Date.now() + 1,
-              color: getRandomColor(),
-              size: newSize,
-              direction: "column", // Ensure vertical stacking for both
-            });
-          }
+          const newPartition = {
+            id: Date.now() + 1,
+            color: getRandomColor(), // New partition gets a new random color
+            size: partition.size / 2, // Halve the size
+            direction: splitDirection === "H" ? "row" : "col", // Horizontal -> row; Vertical -> col
+          };
+          // First partition keeps its old color and size
+          newPartitions.push({
+            ...partition,
+            size: partition.size / 2, // Halve the size
+            direction: splitDirection === "H" ? "row" : "col", // Change the direction accordingly
+          });
+          newPartitions.push(newPartition); // Push new partition with new color
         } else {
           newPartitions.push(partition);
         }
       });
-
-      // If the partition was not found, return the original list
-      if (!partitionFound) return prevPartitions;
-
       return newPartitions;
     });
   };
@@ -76,23 +49,20 @@ const LayoutBuilder = () => {
     );
   };
 
-  // Helper function to determine the flex direction
-  const getFlexDirection = (direction) => {
-    return direction === "row" ? "flex-row" : "flex-col";
-  };
-
   return (
     <div className="w-full h-full p-4 flex flex-col items-center justify-center">
-      <div className="w-full h-[600px] border border-gray-400 overflow-auto">
-        {/* Main flex container */}
-        <div className="w-full h-full flex overflow-auto">
+      <div className="w-full h-[600px] border border-gray-400">
+        {/* Main flex container to handle row or column splits */}
+        <div className="w-full h-full flex">
           {partitions.map((partition) => (
             <div
               key={partition.id}
-              className={`relative border flex ${getFlexDirection(partition.direction)} transition-all duration-300`}
+              className={`relative border ${
+                partition.direction === "col" ? "flex-col" : "flex-row" // Set direction based on partition type
+              } flex transition-all duration-300`}
               style={{
-                flex: partition.size,
-                backgroundColor: partition.color,
+                flex: partition.size, // Set flex size to manage space
+                backgroundColor: partition.color, // Retain color for original partition
               }}
             >
               {/* Buttons for splitting and removing */}
@@ -105,7 +75,7 @@ const LayoutBuilder = () => {
                 </button>
                 <button
                   className="bg-white text-black border p-1 rounded"
-                  onClick={() => splitPartition(partition.id, "V")} // Vertical split (Y-axis)
+                  onClick={() => splitPartition(partition.id, "V")} // Vertical split
                 >
                   V
                 </button>
