@@ -14,7 +14,7 @@ const getRandomColor = () => {
 
 const LayoutBuilder = () => {
   const [partitions, setPartitions] = useState([
-    { id: Date.now(), color: getRandomColor(), size: 1, direction: "row" }, // Default to horizontal (row) direction
+    { id: Date.now(), color: getRandomColor(), size: 1, direction: "row" },
   ]);
 
   const splitPartition = (id, splitDirection) => {
@@ -24,17 +24,17 @@ const LayoutBuilder = () => {
         if (partition.id === id) {
           const newPartition = {
             id: Date.now() + 1,
-            color: getRandomColor(), // New partition gets a new random color
-            size: partition.size / 2, // Halve the size
-            direction: splitDirection === "H" ? "row" : "col", // Horizontal -> row; Vertical -> col
+            color: getRandomColor(), 
+            size: partition.size / 2,
+            direction: splitDirection === "H" ? "row" : "col",
           };
-          // First partition keeps its old color and size
+          
           newPartitions.push({
             ...partition,
-            size: partition.size / 2, // Halve the size
-            direction: splitDirection === "H" ? "row" : "col", // Change the direction accordingly
+            size: partition.size / 2, 
+            direction: splitDirection === "H" ? "row" : "col",
           });
-          newPartitions.push(newPartition); // Push new partition with new color
+          newPartitions.push(newPartition);
         } else {
           newPartitions.push(partition);
         }
@@ -61,8 +61,8 @@ const LayoutBuilder = () => {
                 partition.direction === "col" ? "flex-col" : "flex-row" // Set direction based on partition type
               } flex transition-all duration-300`}
               style={{
-                flex: partition.size, // Set flex size to manage space
-                backgroundColor: partition.color, // Retain color for original partition
+                flex: partition.size, 
+                backgroundColor: partition.color, 
               }}
             >
               {/* Buttons for splitting and removing */}
@@ -73,12 +73,7 @@ const LayoutBuilder = () => {
                 >
                   H
                 </button>
-                <button
-                  className="bg-white text-black border p-1 rounded"
-                  onClick={() => splitPartition(partition.id, "V")} // Vertical split
-                >
-                  V
-                </button>
+                
                 <button
                   className="bg-white text-black border p-1 rounded"
                   onClick={() => removePartition(partition.id)}
